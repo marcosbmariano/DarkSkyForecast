@@ -1,110 +1,65 @@
 package com.mark.darkskyforecast.activities;
 
-import android.app.Dialog;
-import android.location.Location;
-import android.support.v7.app.AppCompatActivity;
+
+
+import android.content.Intent;
+
+
 import android.os.Bundle;
-import android.text.method.ScrollingMovementMethod;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+
 import com.mark.darkskyforecast.R;
-import com.mark.darkskyforecast.helpers.DataHandler;
-import com.mark.darkskyforecast.model.DailyData;
+import com.mark.darkskyforecast.adapters.FragPagerAdapter;
 
-public class MainActivity extends AppCompatActivity implements
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        DataHandler.ForecastObserver{
-    private GoogleApiClient mGoogleApiClient;
-    private Location mLastLocation;
-    private TextView mTv;
+import com.mark.darkskyforecast.services.ForecastRequestService;
+
+
+
+public class MainActivity extends AppCompatActivity {
+
+    private ViewPager mPager;
+    private PagerAdapter mPagerAdapter;
+    private Toolbar mToolbar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        DataHandler.addObserver(this);
-        //setupGoogleApiClient();
-        setupWidgests();
+        startService();
+        setupViewPager();
+        setupWidgets();
+    }
 
-
-        //new DailyData.Builder();
-
-
+    private void setupWidgets(){
+        mToolbar = (Toolbar)findViewById(R.id.app_bar);
+        setSupportActionBar(mToolbar);
 
     }
 
-    private void setupWidgests(){
-        mTv = (TextView) findViewById(R.id.tvMain);
-        mTv.setMovementMethod(new ScrollingMovementMethod());
+    private void setupViewPager(){
+        mPager = (ViewPager)findViewById(R.id.vp_layout);
+        mPagerAdapter = new FragPagerAdapter(getSupportFragmentManager());
+        mPager.setAdapter(mPagerAdapter);
     }
 
-
-    private GoogleApiClient getGoogleApiClient(){
-        if( mGoogleApiClient == null){
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApiIfAvailable(LocationServices.API)
-                    .build();
+    @Override
+    public void onBackPressed() {
+        if(mPager.getCurrentItem() == 0){
+            super.onBackPressed();
+        }else{
+            mPager.setCurrentItem(mPager.getCurrentItem() -1);
         }
-        return mGoogleApiClient;
+    }
+    //every time the onCreate is called the service will be created or the service onStartCommand
+    //will be called to decide if it is time to update forecasts
+    private void startService(){
+        startService(new Intent(this, ForecastRequestService.class));
     }
 
-    private Location getLastLocation(){
-         return LocationServices.FusedLocationApi.getLastLocation(getGoogleApiClient());
-    }
-
-
-    @Override
-    protected void onStart() {
-        getGoogleApiClient().connect();
-
-        super.onStart();
-
-    }
-
-
-    @Override
-    protected void onStop() {
-        mGoogleApiClient.disconnect();
-        super.onStop();
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        mLastLocation = getLastLocation();
-        mTv.setText("Latitude " + mLastLocation.getLatitude() + " Longitude " + mLastLocation.getLongitude());
-        if( mLastLocation != null){
-            DataHandler.getForecasts(mLastLocation.getLatitude(),mLastLocation.getLongitude());
-
-        }
-
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        mTv.setText("Connection failed " + connectionResult.toString());
-        //handle errors
-        //SERVICE_MISSING, SERVICE_VERSION_UPDATE_REQUIRED, SERVICE_DISABLED
-       // GooglePlayServicesUtil.getErrorDialog( this, connectionResult.getErrorCode(), )
-        //https://developers.google.com/android/reference/com/google/android/gms/common/GoogleApiAvailability#getErrorDialog(android.app.Activity, int, int)
-    }
-
-
-    @Override
-    public void setForecastResult(String s) {
-        mTv.setText(s);
-    }
 }

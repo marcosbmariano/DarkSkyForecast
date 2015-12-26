@@ -2,20 +2,11 @@ package com.mark.darkskyforecast.network;
 
 
 import android.util.Log;
-
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
-
-import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -30,20 +21,6 @@ public class VolleyHelper {
    // https://api.forecast.io/forecast/APIKEY/LATITUDE,LONGITUDE,TIME
 
 
-    public static JsonArrayRequest getGetArrayRequest(final Response.Listener<JSONArray> response,
-                                                      final Response.ErrorListener errorListener,
-                                                      final double latitude,
-                                                      final double longitude) {
-
-        Log.e("URL", "Tomar no cu");
-        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, getFormedURL(latitude, longitude),
-                response, errorListener);
-        Log.e("URL", request.getUrl());
-
-        return request;
-    }
-
-
     private static String getFormedURL(final double latitude, final double longitude ){
         return URL + APIKEY + "/" + latitude + "," + longitude;// + "," + (Calendar.getInstance().getTimeInMillis() /1000);
     }
@@ -54,7 +31,7 @@ public class VolleyHelper {
         JsonObjectRequest result =
                 new JsonObjectRequest(Request.Method.GET,getFormedURL(latitude, longitude),
                         response, errorListener);
-        Log.e("URL", result.getUrl());
+        Log.d("URL", result.getUrl());
         return result;
     }
 }

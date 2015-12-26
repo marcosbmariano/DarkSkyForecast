@@ -77,7 +77,7 @@ public class ModelUtil {
                         builder.setTemperatureMin(obj.getDouble(key));
                         break;
                     case PRECIP_TYPE:
-                        builder.setPrecipType(obj.getDouble(key));
+                        builder.setPrecipType(obj.getString(key));
                         break;
                     case PRECIP_ITENSITY_MAX_TIME:
                         builder.setPrecipIntensityMaxTime(obj.getLong(key));
@@ -147,7 +147,6 @@ public class ModelUtil {
                 e.printStackTrace();
             }
         }
-
         return builder.build();
     }
 
@@ -210,13 +209,10 @@ public class ModelUtil {
                         break;
                     default:
                         //do nothing
-
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-
         }
 
         return builder.build();

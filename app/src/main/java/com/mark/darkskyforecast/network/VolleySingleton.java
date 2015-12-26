@@ -29,5 +29,6 @@ public class VolleySingleton {
     private static class Holder{
         private final static VolleySingleton mInstance =
                 new VolleySingleton(MyApplication.getAppContext());
+
     }
 }

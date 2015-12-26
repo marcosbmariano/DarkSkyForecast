@@ -2,6 +2,7 @@ package com.mark.darkskyforecast.model;
 
 /**
  * Created by mark on 12/21/15.
+ *
  */
 public class IconUtil {
     private static final String CLEAR_DAY = "clear-day";
@@ -15,7 +16,7 @@ public class IconUtil {
     private static final String PARTLY_CLOUDY_DAY = "partly-cloudy-day";
     private static final String PARTY_CLOUDY_NIGHT = "partly-cloudy-night";
 
-
+    //the values to be returned must be an id to a drawable
     public static int getIcon(String icon){
 
         switch (icon){
@@ -43,8 +44,6 @@ public class IconUtil {
                 return 0;
 
         }
-
     }
-
 
 }

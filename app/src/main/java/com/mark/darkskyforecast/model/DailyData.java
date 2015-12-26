@@ -1,6 +1,9 @@
 package com.mark.darkskyforecast.model;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -9,13 +12,13 @@ import java.util.List;
 public class DailyData {
 
     private final List<HourlyData> mHourlyData;
-    private HourlyData currentData;
+    private HourlyData currentHourlyData;
     private long sunriseTime;
     private long sunsetTime;
     private double moonPhase;
     private double precipIntensityMax;
     private double precipIntensityMaxTime;
-    private double precipType;
+    private String precipType;
     private double temperatureMin;
     private double temperatureMinTime;
     private double temperatureMax;
@@ -32,21 +35,107 @@ public class DailyData {
         mHourlyData = new ArrayList<>();
     }
 
-    public void addHourlyData(HourlyData data){
-        mHourlyData.add(data);
+    public void setHourlyData(List<HourlyData> hourlyData){
+        HourlyData data = hourlyData.remove(0);
+        setCurrentHourlyData(data);
+        mHourlyData.addAll(hourlyData);
     }
 
-    private void setCurrentData(HourlyData data){
-        currentData = data;
+    private void setCurrentHourlyData(HourlyData data){
+        currentHourlyData = data;
     }
 
-    public List<HourlyData> getmHourlyData() {
+    public List<HourlyData> getHourlyData() {
         return mHourlyData;
+    } //TODO fix this
+
+    public HourlyData getCurrentHourlyData() {
+        return currentHourlyData;
     }
 
-    public HourlyData getCurrentData() {
-        return currentData;
+
+    public long getLastHourlyDataTime(){
+        long result = 0;
+        if( getHourlyData() != null && getHourlyData().size() > 0){
+            int lastDataIndex = getHourlyData().size() -1;
+            result = getHourlyData().get(lastDataIndex).getTime();
+        }
+        return result;
     }
+    public String getStringDate(){
+        return new SimpleDateFormat("EE MMM d").format(getDate());
+    }
+
+    private Date getDate(){  //TODO move to a date utils class
+        if ( getTime() == 0 ){
+            return new Date();
+        }else{
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(getTime() * 1000);
+            return calendar.getTime();
+        }
+    }
+
+    public long getTime() {
+        return getCurrentHourlyData().getTime();
+    }
+
+    public String getSummary() {
+        return getCurrentHourlyData().getSummary();
+    }
+
+    public int getIcon() {
+        return getCurrentHourlyData().getIcon();
+    }
+
+    public double getPrecipIntensity() {
+        return getCurrentHourlyData().getPrecipIntensity();
+    }
+
+    public double getPrecipProbability() {
+        return getCurrentHourlyData().getPrecipProbability();
+    }
+
+    public double getTemperature() {
+        return getCurrentHourlyData().getTemperature();
+    }
+
+    public double getApparentTemperature() {
+        return getCurrentHourlyData().getApparentTemperature();
+    }
+
+    public double getDewPoint() {
+        return getCurrentHourlyData().getDewPoint();
+    }
+
+    public double getHumidity() {
+        return getCurrentHourlyData().getHumidity();
+    }
+
+    public double getWindSpeed() {
+        return getCurrentHourlyData().getWindSpeed();
+    }
+
+    public double getWindBearing() {
+        return getCurrentHourlyData().getWindBearing();
+    }
+
+    public double getVisibility() {
+        return getCurrentHourlyData().getVisibility();
+    }
+
+    public double getCloudCover() {
+        return getCurrentHourlyData().getCloudCover();
+    }
+
+    public double getPressure() {
+        return getCurrentHourlyData().getPressure();
+    }
+
+    public double getOzone() {
+        return getCurrentHourlyData().getOzone();
+    }
+
 
     public long getSunriseTime() {
         return sunriseTime;
@@ -68,7 +157,7 @@ public class DailyData {
         return precipIntensityMaxTime;
     }
 
-    public double getPrecipType() {
+    public String getPrecipType() {
         return precipType;
     }
 
@@ -115,7 +204,7 @@ public class DailyData {
         }
 
         public DailyData build(){
-            result.setCurrentData(hourlyBuilder.build());
+            result.setCurrentHourlyData(hourlyBuilder.build());
             return result;
         }
 
@@ -169,7 +258,7 @@ public class DailyData {
             return this;
         }
 
-        public DailyData.Builder setPrecipType(double precipType) {
+        public DailyData.Builder setPrecipType(String precipType) {
             result.precipType = precipType;
             return this;
         }
