@@ -1,17 +1,30 @@
 package com.mark.darkskyforecast.model;
 
+import android.util.Log;
+
+import com.mark.darkskyforecast.helpers.DateHelper;
+
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.ArrayDeque;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Deque;
 import java.util.List;
 
 /**
  * Created by mark on 12/21/15.
+ * this class represent the forecast for one day
+ * if the DailyObject represents today forecast
+ * the hourly data will be the API provided hourly data
+ * mHourlyData data is the all hourly data provided by today
+ * current HourlyData is the current data by the hour
+ * else, it will be null
+ *
+ * besides Hourly data, this class is immutable *
  */
 public class DailyData {
 
-    private final List<HourlyData> mHourlyData;
+    private final Deque<HourlyData> mHourlyData;
     private HourlyData currentHourlyData;
     private long sunriseTime;
     private long sunsetTime;
@@ -32,110 +45,130 @@ public class DailyData {
 
 
     private DailyData(){
-        mHourlyData = new ArrayList<>();
+        mHourlyData = new ArrayDeque<>();
     }
 
-    public void setHourlyData(List<HourlyData> hourlyData){
-        HourlyData data = hourlyData.remove(0);
-        setCurrentHourlyData(data);
+    public void setHourlyData(Deque<HourlyData> hourlyData){
         mHourlyData.addAll(hourlyData);
     }
 
-    private void setCurrentHourlyData(HourlyData data){
+    public void setCurrentHourlyData(HourlyData data){
         currentHourlyData = data;
     }
 
-    public List<HourlyData> getHourlyData() {
+    public Deque<HourlyData> getHourlyDataDeque() {
         return mHourlyData;
-    } //TODO fix this
-
-    public HourlyData getCurrentHourlyData() {
-        return currentHourlyData;
     }
 
+    //this method is called to update current hour
+    //if all the hourlydata is not from today
+    //return false to signal that the whole forecast
+    //must be updated
+    public boolean updateHourlyData(){
+        //if the current hourly data is current return true;
+        if( DateHelper.isHourCurrent(getTime())) return true;
 
-    public long getLastHourlyDataTime(){
-        long result = 0;
-        if( getHourlyData() != null && getHourlyData().size() > 0){
-            int lastDataIndex = getHourlyData().size() -1;
-            result = getHourlyData().get(lastDataIndex).getTime();
+        //if the current hourly data is not current, get the current
+        //hourly data
+        HourlyData currentHourData =
+                getCurrentHourDataFromDeque(getHourlyDataDeque());
+
+        //if no hourly data was founded, return false
+        if( currentHourData == null)  return false;
+
+        //if the current hourly data was found, set it as the
+        //current hourly data and return true;
+        setCurrentHourlyData(currentHourData);
+        Log.d("DailyData", "Update hourly data");
+        return true;
+    }
+
+    private HourlyData getCurrentHourDataFromDeque(Deque<HourlyData> deque){
+        boolean loop = true;
+        HourlyData result = null;
+        //pop away any hourly data older than one hour
+        while ( !deque.isEmpty() && loop ){
+            if(!DateHelper.isHourCurrent(deque.peek().getTime()) ){
+                deque.pop();
+            }else{
+                result = deque.pop();
+                loop = false;
+            }
         }
         return result;
     }
+
+    public HourlyData getCurrentHourData() {
+        return currentHourlyData;
+    }
+
     public String getStringDate(){
         return new SimpleDateFormat("EE MMM d").format(getDate());
     }
-
-    private Date getDate(){  //TODO move to a date utils class
+    //if time is null, get a new Date object
+    //else, get a Date object based on the current timeStamp provided by the
+    //API
+    private Date getDate(){
         if ( getTime() == 0 ){
             return new Date();
         }else{
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(getTime() * 1000);
-            return calendar.getTime();
+            return DateHelper.timeStampToCalendar(getTime()).getTime();
         }
     }
 
     public long getTime() {
-        return getCurrentHourlyData().getTime();
+        return getCurrentHourData().getTime();
     }
 
     public String getSummary() {
-        return getCurrentHourlyData().getSummary();
+        return getCurrentHourData().getSummary();
     }
 
     public int getIcon() {
-        return getCurrentHourlyData().getIcon();
+        return getCurrentHourData().getIcon();
     }
 
-    public double getPrecipIntensity() {
-        return getCurrentHourlyData().getPrecipIntensity();
-    }
+    public double getPrecipIntensity() {  return getCurrentHourData().getPrecipIntensity();}
 
-    public double getPrecipProbability() {
-        return getCurrentHourlyData().getPrecipProbability();
-    }
+    public double getPrecipProbability() { return getCurrentHourData().getPrecipProbability(); }
 
     public double getTemperature() {
-        return getCurrentHourlyData().getTemperature();
+        return getCurrentHourData().getTemperature();
     }
 
-    public double getApparentTemperature() {
-        return getCurrentHourlyData().getApparentTemperature();
-    }
+    public double getApparentTemperature() { return getCurrentHourData().getApparentTemperature();}
 
     public double getDewPoint() {
-        return getCurrentHourlyData().getDewPoint();
+        return getCurrentHourData().getDewPoint();
     }
 
     public double getHumidity() {
-        return getCurrentHourlyData().getHumidity();
+        return getCurrentHourData().getHumidity();
     }
 
     public double getWindSpeed() {
-        return getCurrentHourlyData().getWindSpeed();
+        return getCurrentHourData().getWindSpeed();
     }
 
     public double getWindBearing() {
-        return getCurrentHourlyData().getWindBearing();
+        return getCurrentHourData().getWindBearing();
     }
 
     public double getVisibility() {
-        return getCurrentHourlyData().getVisibility();
+        return getCurrentHourData().getVisibility();
     }
 
     public double getCloudCover() {
-        return getCurrentHourlyData().getCloudCover();
+        return getCurrentHourData().getCloudCover();
     }
 
     public double getPressure() {
-        return getCurrentHourlyData().getPressure();
+        return getCurrentHourData().getPressure();
     }
 
     public double getOzone() {
-        return getCurrentHourlyData().getOzone();
+        return getCurrentHourData().getOzone();
     }
-
 
     public long getSunriseTime() {
         return sunriseTime;

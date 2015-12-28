@@ -14,11 +14,10 @@ import com.mark.darkskyforecast.model.ForecastHelper;
  * Created by mark on 12/22/15.
  *
  * This service handles the request to a Forecast
- *
+ * every 5 minutes update the data
  *
  */
 public class ForecastRequestService extends Service {
-    private static CountDownTimer mTimer;
 
     @Nullable
     @Override
@@ -29,41 +28,35 @@ public class ForecastRequestService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        getForecasts();
+        updateForecast();
         setCountDownTimer();
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void getForecasts(){
-        if( isTimeToRequestForecasts()){
-            ForecastHelper.getInstance().getForecasts();
-        }
-    }
-    //check if it is time to request forecast
-    //the schedule will be based on the last hourly available or
-    //at the turn of the current day
-    private boolean isTimeToRequestForecasts(){
-
-        return true;
-    }
-
     private void setCountDownTimer(){
-        mTimer = new CountDownTimer(60000L, 60000L) {
-            Forecast forecast = Forecast.getInstance();
-            ForecastHelper helper = ForecastHelper.getInstance();
+        long oneHour = 3600000L;
+        long fiveMinutes = 300000L;
+
+        //check if needs to update every 5 minutes it could be less frequent
+        new CountDownTimer(oneHour, fiveMinutes) {
             @Override
-            public void onTick(long millisUntilFinished) {}
+            public void onTick(long millisUntilFinished) {
+                updateForecast();
+            }
 
             @Override
             public void onFinish() {
-                Log.e("CountDown", "OnFinish");
-                //ForecastHelper.getInstance().getForecasts();
-                //setCountDownTimer();
+                setCountDownTimer();
             }
         }.start();
-
-
     }
 
-
+    private static void updateForecast(){
+        //try to update hourly data for current day
+        if( !Forecast.getInstance().updateForecast()){
+            //if fails, update the whole forecast
+            ForecastHelper.getInstance().getForecasts();
+            Log.e("updateForecast", "Get new Forecast");
+        }
+    }
 }

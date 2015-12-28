@@ -13,129 +13,107 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+
+import java.util.Deque;
 import java.util.List;
 
 
 /**
  * Created by mark on 12/21/15.
- *
- *
+ * this class handles the conversion of the JSON response to
+ * a Forecast object based on DailyData and Hourly data object
  *
  */
 public class DataHandler {
     private static final String DAILY_KEY = "daily";
     private static final String HOURLY_KEY = "hourly";
     private static final String DATA_KEY = "data";
+    private static final String CURRENTLY_KEY = "currently";
 
-//    public static void getForecasts(final double latitude,
-//                                    final double longitude){
-//
-//        RequestQueue queue = VolleySingleton.getInstance().getRequestQueue();
-//        queue.add(VolleyHelper.getJsonRequest(getJSONResponse(),
-//                getErrorResponse(), latitude, longitude));
-//    }
-
+    //this is a call back method used by Volley library to handle
+    //a positive request
     public static Response.Listener<JSONObject> getJSONResponse(){
 
         return new Response.Listener<JSONObject>(){
             @Override
             public void onResponse(JSONObject response) {
                 if ( response != null){
-                    Log.d("OnResponse()", response.toString());
-
-                    Forecast.getInstance().setNextDaysForecast(getDailyData(response));
+                    Forecast.getInstance().setNextDaysForecast(setupData(response));
                 }
             }
         };
     }
 
-    public static List<DailyData> getDailyData(JSONObject response){ //TODO must be improved
+    //this method handles the JSONObject return by the call to the website
+    public static List<DailyData> setupData(JSONObject response){
         List<DailyData> dailyData = new ArrayList<>();
-        List<HourlyData> hourlyData = new ArrayList<>();
+        Deque<HourlyData> hourlyData;
 
         try {
-            Log.e("Is today ", " " + isToday(((JSONObject) response.get("currently")).getLong("time")));
-            //make this as today
-
-            JSONObject daily = (JSONObject) response.get(DAILY_KEY);
-            JSONArray dailyArray = (JSONArray)daily.get(DATA_KEY);
-            dailyData = getDailyData(dailyArray);
-
-            JSONObject hourly = (JSONObject)response.get(HOURLY_KEY);
-            JSONArray hourlyArray = (JSONArray)hourly.get(DATA_KEY);
-            hourlyData = getHourlyDataForToday(hourlyArray);
-
+            //get the current hourly data
+            HourlyData now = getTodayDataFromJson(response);
+            //get the next week data
+            dailyData = getDailyData(response);
+            //get all the hourly data for today
+            hourlyData = getHourlyDataForToday(response);
+            //set all the hourly data for today (today is index 0 )
             dailyData.get(0).setHourlyData(hourlyData);
+            //set the currently hourly data for today as current
+            dailyData.get(0).setCurrentHourlyData(now);
 
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e("DataHandler ERROR", e.toString());
         }
         return dailyData;
     }
 
+    //get the "currentrly" hourly data
+    private static HourlyData getTodayDataFromJson(JSONObject response) throws JSONException {
+        JSONObject today = (JSONObject) response.get(CURRENTLY_KEY);
+        return ModelUtil.getHourlyDataFromJson(today);
+    }
 
-    private static List<DailyData> getDailyData( JSONArray dailyArray){
+    //get week data
+    private static List<DailyData> getDailyData(JSONObject response) throws JSONException {
         List<DailyData> result = new ArrayList<>();
-        for( int i = 0; i < dailyArray.length(); i++){
-            try {
-                result.add(ModelUtil.getDailyDataFromJson((dailyArray.getJSONObject(i))));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+        JSONObject daily = (JSONObject) response.get(DAILY_KEY);
+        JSONArray dailyArray = (JSONArray) daily.get(DATA_KEY);
+
+        for (int i = 0; i < dailyArray.length(); i++) {
+            result.add(ModelUtil.getDailyDataFromJson((dailyArray.getJSONObject(i))));
         }
+
         return result;
     }
-
-//Log.e("Is today ", " " + isToday(dailyArray.getJSONObject(i).getLong("time")));
-
-
-    private static List<HourlyData> getHourlyDataForToday( JSONArray hourlyData ){
-        List<HourlyData> result = new ArrayList<>();
-        boolean isHourlyDataFromToday = false;
+    //get only the hourly data for today
+    private static Deque<HourlyData> getHourlyDataForToday(JSONObject response) throws JSONException {
+        Deque<HourlyData> result = new ArrayDeque<>();
+        JSONObject hourly = (JSONObject) response.get(HOURLY_KEY);
+        JSONArray hourlyArray = (JSONArray) hourly.get(DATA_KEY);
+        boolean isHourlyDataFromToday;
         int index = 0;
-        if ( hourlyData.length() > 0){
-            try {
-                isHourlyDataFromToday = isToday(hourlyData.getJSONObject(index).getLong("time"));
 
-                while (isHourlyDataFromToday){
-                    result.add(ModelUtil.getHourlyDataFromJson(hourlyData.getJSONObject(index++)));
-                    Log.e("Is hourly today ", " " + isToday(hourlyData.getJSONObject(index).getLong("time")));
-                    isHourlyDataFromToday = isToday(hourlyData.getJSONObject(index).getLong("time"));
-                }
+        if (hourlyArray.length() > 0) {
+            isHourlyDataFromToday = DateHelper.isToday(hourlyArray.getJSONObject(index).getLong("time"));
 
-            } catch (JSONException e) {
-                e.printStackTrace();
+            while (isHourlyDataFromToday) {
+                result.push(ModelUtil.getHourlyDataFromJson(hourlyArray.getJSONObject(index++)));
+                isHourlyDataFromToday = DateHelper.isToday(hourlyArray.getJSONObject(index).getLong("time"));
             }
         }
 
         return result;
     }
 
-    //Check if the calendars belong to the same day
-    private static boolean isToday(long timeStamp){
-        return isSameDay(Calendar.getInstance(), timeStampToDate(timeStamp));
-    }
-
-    private static boolean isSameDay(Calendar referenceTimeStamp, Calendar comparedTimeStamp){
-        return ( referenceTimeStamp.get(Calendar.DAY_OF_YEAR) ==
-                comparedTimeStamp.get(Calendar.DAY_OF_YEAR));
-    }
-
-    private static Calendar timeStampToDate(long timeStamp){ //TODO move to a date utils class
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(timeStamp * 1000);
-        return calendar;
-    }
-
-    public static Response.ErrorListener getErrorResponse(){
+    //this method handles the error if the call to Volley fails
+    public static Response.ErrorListener getErrorResponse(){ //TODO must me improved
         return new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-               Log.e("ERRRRRO", " "+ error.toString());
+               Log.e("ERROR", " "+ error.toString());
             }
         };
     }

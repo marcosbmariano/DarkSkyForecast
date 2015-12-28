@@ -14,6 +14,7 @@ import com.mark.darkskyforecast.model.Forecast;
 
 /**
  * Created by mark on 12/25/15.
+ * this fragment handles the hourly data
  */
 public class HourlyDataFrag  extends Fragment implements Forecast.ForecastObserver{
     private TextView mTemp;

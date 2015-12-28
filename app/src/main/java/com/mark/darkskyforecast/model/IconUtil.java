@@ -18,7 +18,7 @@ public class IconUtil {
 
     //the values to be returned must be an id to a drawable
     public static int getIcon(String icon){
-
+        //the values to be returned are the ids of the images
         switch (icon){
             case CLEAR_DAY:
                 return 0;

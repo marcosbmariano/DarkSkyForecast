@@ -2,6 +2,8 @@ package com.mark.darkskyforecast.model;
 
 /**
  * Created by mark on 12/21/15.
+ * this class represent the hourly data provided by the API
+ * it is immutable
  */
 public class HourlyData {
 

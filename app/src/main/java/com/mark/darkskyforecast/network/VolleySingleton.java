@@ -18,7 +18,6 @@ public class VolleySingleton {
     }
 
     public static VolleySingleton getInstance(){
-
         return Holder.mInstance;
     }
 

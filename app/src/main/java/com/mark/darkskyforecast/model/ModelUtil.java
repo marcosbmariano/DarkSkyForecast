@@ -7,6 +7,7 @@ import java.util.Iterator;
 
 /**
  * Created by mark on 12/21/15.
+ * this class handles the conversion of JSON data into DailyData and HourlyData
  */
 public class ModelUtil {
 

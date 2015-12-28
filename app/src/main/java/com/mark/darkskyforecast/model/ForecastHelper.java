@@ -15,6 +15,8 @@ import com.mark.darkskyforecast.network.VolleySingleton;
 
 /**
  * Created by mark on 12/23/15.
+ * this class is responsible to make the get call to the API
+ *
  */
 public class ForecastHelper implements  GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
@@ -36,13 +38,6 @@ public class ForecastHelper implements  GoogleApiClient.ConnectionCallbacks,
     public void getForecasts(){
         mGoogleApiClient.connect();
     }
-
-//    private GoogleApiClient getGoogleApiClient(){
-//        if( mGoogleApiClient == null){
-//            mGoogleApiClient = getNewGoogleApiClient();
-//        }
-//        return mGoogleApiClient;
-//    }
 
     private GoogleApiClient getNewGoogleApiClient(){
         return new GoogleApiClient.Builder(MyApplication.getAppContext())
@@ -73,7 +68,7 @@ public class ForecastHelper implements  GoogleApiClient.ConnectionCallbacks,
 
     @Override
     public void onConnectionSuspended(int i) {
-
+        //TODO fix this
     }
 
     @Override
