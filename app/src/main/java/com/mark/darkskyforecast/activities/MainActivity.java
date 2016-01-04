@@ -11,15 +11,17 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import com.mark.darkskyforecast.R;
+import com.mark.darkskyforecast.activities.broadcast_receivers.AlarmReceiver;
 import com.mark.darkskyforecast.adapters.FragPagerAdapter;
-import com.mark.darkskyforecast.services.ForecastRequestService;
-
+import com.mark.darkskyforecast.model.Forecast;
 
 
 public class MainActivity extends AppCompatActivity {
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
     private Toolbar mToolbar;
+    private AlarmReceiver mAlarmReceiver;
+
 
 
 
@@ -27,9 +29,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        startService();
         setupViewPager();
         setupWidgets();
+        //set initial alarm
+        mAlarmReceiver = new AlarmReceiver();
+        mAlarmReceiver.setAlarm(this);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Forecast.getInstance().updateForecast();
     }
 
     private void setupWidgets(){
@@ -52,11 +63,5 @@ public class MainActivity extends AppCompatActivity {
             mPager.setCurrentItem(mPager.getCurrentItem() -1);
         }
     }
-    //every time the onCreate is called the service will be created or the service onStartCommand
-    //will be called to decide if it is time to update forecasts
-    private void startService(){
-        startService(new Intent(this, ForecastRequestService.class));
-    }
-
 
 }

@@ -1,6 +1,8 @@
 package com.mark.darkskyforecast.model;
 
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -36,17 +38,27 @@ public class Forecast {
     public List<DailyData> getNextDaysForecast(){
         return nextDaysForecast;
     }
-    //return false if updateForecast fails
-    public boolean updateForecast(){
-        if( mToday == null){
-            return false;
+
+
+    public void updateForecast(){
+        if( null == mToday ){
+            ForecastHelper.getInstance().getForecasts();
+            Log.e("update Forecast", "New Foreacast");
+        }else{
+           if( !mToday.updateHourlyData()) {
+               ForecastHelper.getInstance().getForecasts();
+               Log.e("update Hourly ", "Failed");
+           }
         }
-        return mToday.updateHourlyData();
+
+
     }
 
     public DailyData getTodayForecast(){
         return mToday;
     }
+
+
 
 }
 

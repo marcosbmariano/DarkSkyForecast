@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"></uses-permission>
     <application
 
         android:allowBackup="true"
@@ -20,8 +22,15 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".services.ForecastRequestService"
+            android:name=".services.SchedulingService"
             android:exported="false"/>
+        <receiver android:name=".activities.broadcast_receivers.BootReceiver"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".activities.broadcast_receivers.AlarmReceiver"></receiver>
     </application>
 
 </manifest>
