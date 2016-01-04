@@ -16,15 +16,19 @@ import java.util.List;
 /**
  * Created by mark on 12/22/15.
  */
-public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.HV> implements Forecast.ForecastObserver{
+public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.HV> {
     private static LayoutInflater mInflater;
     private List<DailyData> mNextDays;
 
 
     public RecyclerAdapter(Context context){
-        Forecast.addObserver(this);
         mInflater = LayoutInflater.from(context);
         mNextDays = Forecast.getInstance().getNextDaysForecast();
+    }
+
+    public void updateData(){
+        mNextDays = Forecast.getInstance().getNextDaysForecast();
+        notifyDataSetChanged();
     }
 
 
@@ -48,19 +52,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.HV> im
         return mNextDays.size();
     }
 
-    @Override
-    public void setForecastResult() {
-        mNextDays = Forecast.getInstance().getNextDaysForecast();
-        notifyDataSetChanged();
-    }
-
     class HV extends RecyclerView.ViewHolder{
         private TextView mTemp;
         private TextView mSummary;
         private TextView mMinMaxTemp;
         private TextView mDate;
-
-
 
         public HV(View itemView) {
             super(itemView);

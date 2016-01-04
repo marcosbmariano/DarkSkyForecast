@@ -11,10 +11,10 @@ import org.json.JSONObject;
 
 /**
  * Created by mark on 12/21/15.
- * This class handles the http call
+ * This class handles all the volley http calls
  */
 public class VolleyHelper {
-    private static final String APIKEY = "";
+    private static final String APIKEY = "203bf0976335ed98863b556ed9f61f79";
     private static final String URL = "https://api.forecast.io/forecast/";
 
    // https://api.forecast.io/forecast/APIKEY/LATITUDE,LONGITUDE,TIME

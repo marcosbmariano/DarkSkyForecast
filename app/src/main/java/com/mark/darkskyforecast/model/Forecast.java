@@ -17,10 +17,8 @@ public class Forecast {
 
     private List<DailyData> nextDaysForecast = new ArrayList<>();
     private static DailyData mToday;
-    private static Set<ForecastObserver> mObserver = new HashSet<>();
 
     private Forecast(){}
-
 
     public static Forecast getInstance(){
         return Holder.mInstance;
@@ -33,14 +31,6 @@ public class Forecast {
     public void setNextDaysForecast(List<DailyData> nextDaysForecast){
         mToday = nextDaysForecast.remove(0);
         this.nextDaysForecast = nextDaysForecast;
-        warnObservers();
-    }
-    //warn observers when there is a change in the forecast data
-    private void warnObservers(){
-        Iterator<ForecastObserver> iterator = mObserver.iterator();
-        while( iterator.hasNext()){
-            iterator.next().setForecastResult();
-        }        
     }
 
     public List<DailyData> getNextDaysForecast(){
@@ -56,18 +46,6 @@ public class Forecast {
 
     public DailyData getTodayForecast(){
         return mToday;
-    }
-
-    public static void addObserver(ForecastObserver observer){
-        mObserver.add(observer);
-    }
-
-    public static void removeObserver(){
-        //todo check this
-    }
-
-    public interface ForecastObserver{
-        void setForecastResult();
     }
 
 }

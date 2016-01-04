@@ -30,9 +30,14 @@ public class ForecastRequestService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         updateForecast();
         setCountDownTimer();
-        return super.onStartCommand(intent, flags, startId);
+        return Service.START_STICKY;
     }
 
+    //the behavior of this regular call is not ok
+    //the call to the server must have some randomness  because the way it is right now
+    //it will have problems if all the apps try to update from the server at the same time.
+    //and instead of call every 5 minutes, it should call just after a new hour starts
+    //such as 5:01, 6:01 to update the hourly data
     private void setCountDownTimer(){
         long oneHour = 3600000L;
         long fiveMinutes = 300000L;

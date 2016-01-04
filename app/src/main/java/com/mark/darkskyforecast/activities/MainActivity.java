@@ -2,29 +2,25 @@ package com.mark.darkskyforecast.activities;
 
 
 
+
 import android.content.Intent;
-
-
 import android.os.Bundle;
-
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-
 import com.mark.darkskyforecast.R;
 import com.mark.darkskyforecast.adapters.FragPagerAdapter;
-
 import com.mark.darkskyforecast.services.ForecastRequestService;
 
 
 
 public class MainActivity extends AppCompatActivity {
-
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
     private Toolbar mToolbar;
+
 
 
     @Override
@@ -61,5 +57,6 @@ public class MainActivity extends AppCompatActivity {
     private void startService(){
         startService(new Intent(this, ForecastRequestService.class));
     }
+
 
 }

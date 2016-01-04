@@ -1,9 +1,13 @@
 package com.mark.darkskyforecast.helpers;
 
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.mark.darkskyforecast.applications.MyApplication;
+
 import com.mark.darkskyforecast.model.DailyData;
 import com.mark.darkskyforecast.model.Forecast;
 import com.mark.darkskyforecast.model.HourlyData;
@@ -31,6 +35,9 @@ public class DataHandler {
     private static final String HOURLY_KEY = "hourly";
     private static final String DATA_KEY = "data";
     private static final String CURRENTLY_KEY = "currently";
+    public static final String NEW_FORECAST_DOWNLOADED =
+            "com.mark.darkskyforecast.NEW_FORECAST_DOWNLOADED";
+
 
     //this is a call back method used by Volley library to handle
     //a positive request
@@ -41,9 +48,16 @@ public class DataHandler {
             public void onResponse(JSONObject response) {
                 if ( response != null){
                     Forecast.getInstance().setNextDaysForecast(setupData(response));
+                    sendNewForecastBroadcast();
                 }
             }
         };
+    }
+
+    private static void sendNewForecastBroadcast(){
+        Intent intent = new Intent(NEW_FORECAST_DOWNLOADED);
+        LocalBroadcastManager
+                .getInstance(MyApplication.getAppContext()).sendBroadcast(intent);
     }
 
     //this method handles the JSONObject return by the call to the website
@@ -62,7 +76,6 @@ public class DataHandler {
             dailyData.get(0).setHourlyData(hourlyData);
             //set the currently hourly data for today as current
             dailyData.get(0).setCurrentHourlyData(now);
-
 
         } catch (JSONException e) {
             Log.e("DataHandler ERROR", e.toString());

@@ -16,7 +16,7 @@ import com.mark.darkskyforecast.model.Forecast;
  * Created by mark on 12/25/15.
  * this fragment handles the hourly data
  */
-public class HourlyDataFrag  extends Fragment implements Forecast.ForecastObserver{
+public class HourlyDataFrag  extends Fragment {
     private TextView mTemp;
     private TextView mHumidity;
     private TextView mWindSpeed;
@@ -27,14 +27,15 @@ public class HourlyDataFrag  extends Fragment implements Forecast.ForecastObserv
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Forecast.addObserver(this);
     }
+
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup)inflater.inflate(R.layout.houly_data_layout, container, false);
         setupWidgets(rootView);
+        setForecastResult();
         return rootView;
     }
 
@@ -42,20 +43,19 @@ public class HourlyDataFrag  extends Fragment implements Forecast.ForecastObserv
     private void setupWidgets(View v){
         mTemp = (TextView)v.findViewById(R.id.tvHourlyTemp);
         mHumidity = (TextView)v.findViewById(R.id.tvHumidity);
-        mWindSpeed = (TextView)v.findViewById(R.id.tvVisibility);
+        mWindSpeed = (TextView)v.findViewById(R.id.tvWindSpeed);
         mPressure = (TextView)v.findViewById(R.id.tvPressure);
         mVisibility = (TextView)v.findViewById(R.id.tvVisibility);
 
     }
 
-    @Override
-    public void setForecastResult() {
-        DailyData today  = Forecast.getInstance().getTodayForecast();
-        mTemp.setText("Temperature " + today.getTemperature());
-        mHumidity.setText("Humidity "+ today.getHumidity());
-        mWindSpeed.setText("Wind speed " + today.getWindSpeed());
-        mVisibility.setText("Visibility " + today.getVisibility());
-        mPressure.setText("Pressure " + today.getPressure());
 
+    public void setForecastResult() {
+        //DailyData today  = Forecast.getInstance().getTodayForecast();
+        mTemp.setText("Temperature " );//+ today.getTemperature());
+        mHumidity.setText("Humidity " );//+ today.getHumidity());
+        mWindSpeed.setText("Wind speed ");// + today.getWindSpeed());
+        mVisibility.setText("Visibility ");// + today.getVisibility());
+        mPressure.setText("Pressure " );//+ today.getPressure());
     }
 }
