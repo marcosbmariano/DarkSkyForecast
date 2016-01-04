@@ -1,4 +1,4 @@
-package com.mark.darkskyforecast.activities.broadcast_receivers;
+package com.mark.darkskyforecast.broadcast_receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

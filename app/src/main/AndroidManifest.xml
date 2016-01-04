@@ -24,13 +24,13 @@
         <service
             android:name=".services.SchedulingService"
             android:exported="false"/>
-        <receiver android:name=".activities.broadcast_receivers.BootReceiver"
+        <receiver android:name=".broadcast_receivers.BootReceiver"
             android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"></action>
             </intent-filter>
         </receiver>
-        <receiver android:name=".activities.broadcast_receivers.AlarmReceiver"></receiver>
+        <receiver android:name=".broadcast_receivers.AlarmReceiver"></receiver>
     </application>
 
 </manifest>

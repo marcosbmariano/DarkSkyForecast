@@ -1,4 +1,4 @@
-package com.mark.darkskyforecast.activities.broadcast_receivers;
+package com.mark.darkskyforecast.broadcast_receivers;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -11,6 +11,7 @@ import android.support.v4.content.WakefulBroadcastReceiver;
 import com.mark.darkskyforecast.services.SchedulingService;
 
 import java.util.Calendar;
+import java.util.Random;
 
 /**
  * Created by mark on 1/4/16.
@@ -34,10 +35,12 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         //set the alarm's trigger to ~1:30 a.m
-        calendar.set(Calendar.HOUR_OF_DAY, 14);
-        calendar.set(Calendar.MINUTE, 15);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        //random minuts to avoid all apps calling the server at same time
+        Random random = new Random();
+        calendar.set(Calendar.MINUTE, (10 + random.nextInt(20)));
 
-        //set the alarm to fire at approximately 1:30, acconding to the device's clock
+        //set the alarm to fire at approximately 0:20, according to the device's clock
         //and to repeat once a day
         mAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,
                 calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, mPendingAlarmIntent);

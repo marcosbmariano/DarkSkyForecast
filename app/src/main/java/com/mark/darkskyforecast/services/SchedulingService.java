@@ -18,7 +18,6 @@ public class SchedulingService extends IntentService{
     @Override
     protected void onHandleIntent(Intent intent) {
         Forecast.getInstance().updateForecast();
-        Log.d("SchedulingService", "Get new Forecast");
     }
 
 }
